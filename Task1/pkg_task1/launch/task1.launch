@@ -1,12 +1,11 @@
 <launch>
 
-
 <!-- pyiot.yaml-->
 <rosparam file ="$(find pkg_actions_ros_iot_bridge)/config/config_pyiot.yaml"/>
 
 <!--node_action_server_ros_iot_bridge-->>
 <node pkg="pkg_ros_iot_bridge" type="node_action_server_ros_iot_bridge.py" name="node_action_server_ros_iot_bridge" 
-output="screen">
+output="screen"/>
 
 <!--turtlesim_node_default colors-->
 <node pkg="turtlesim" type="turtlesim_node" name="node_turtlesim_node" 
