@@ -20,7 +20,7 @@ class SimpleActionServerTurtle:
     
     # Constructor
     def __init__(self):
-
+        
         # Initialize Simple Action Server
         self._sas = actionlib.SimpleActionServer('/action_turtle',
                                                  myActionMsgAction,
