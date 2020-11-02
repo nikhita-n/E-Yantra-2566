@@ -3,7 +3,7 @@
 config_pyiot:
   mqtt:
     server_url: "broker.mqttdashboard.com"        # http://www.hivemq.com/demos/websocket-client/
-    # server_url: "test.mosquitto.org"			  # Alternative to HiveMQ
+    #server_url: "test.mosquitto.org"			  #Alternative to HiveMQ
     server_port: 1883
     topic_sub: "eyrc/rSnN4321/iot_to_ros"          # <unique_id> = xYzqLm
     topic_pub: "eyrc/rSnN4321/ros_to_iot"          # <unique_id> = xYzqLm
@@ -11,4 +11,4 @@ config_pyiot:
 
     sub_cb_ros_topic: "/ros_iot_bridge/mqtt/sub"   # ROS nodes can listen to this topic to receive data from MQTT
 google_apps:
-	spread_sheet_id:
+  spread_sheet_id:
