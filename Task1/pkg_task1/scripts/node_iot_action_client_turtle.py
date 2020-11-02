@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 # ROS Node - Simple Action Client - Turtle
 
 import rospy
