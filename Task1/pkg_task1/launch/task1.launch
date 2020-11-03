@@ -4,7 +4,7 @@
 <rosparam file ="$(find pkg_ros_iot_bridge)/config/config_pyiot.yaml"/>
 
 <!--node_action_server_ros_iot_bridge-->
-<node pkg="pkg_ros_iot_bridge" type="node_action_server_ros_iot_bridge.py" name="node_action_server_ros_iot_bridge" 
+<node pkg="pkg_ros_iot_bridge" type="node_action_server_ros_iot_bridge.py" name="node_action_server_ros_iot_bridge.py" 
 output="screen"/>
 
 <!--turtlesim_node_default colors-->
@@ -25,7 +25,7 @@ output="screen"/>
 
 
 <!--node_simple_action_server_turtle-->
-<node pkg="pkg_task1" type="node_simple_action_server_turtle.py" name="node_simple_action_server_turtle" 
+<node pkg="pkg_task1" type="node_simple_action_server_turtle.py" name="node_simple_action_server_turtle.py" 
 output="screen"/>
 
 <!--add shell script to launch file-->
@@ -34,7 +34,7 @@ output="screen"/>
 </node>
 
 <!--node_iot_action_client_turtle.py-->
-<node pkg="pkg_task1" type="node_iot_action_client_turtle.py" name="node_iot_action_client_turtle" 
+<node pkg="pkg_task1" type="node_iot_action_client_turtle.py" name="node_iot_action_client_turtle.py" 
 output="screen"/>
 
 
