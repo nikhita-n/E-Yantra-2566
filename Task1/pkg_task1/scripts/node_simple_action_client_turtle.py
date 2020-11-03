@@ -34,9 +34,10 @@ from pkg_ros_iot_bridge.msg import msgMqttSub
 #     else:
 #         return 0
 
-def mqtt_sub_callback(self, client, userdata, message):
-    payload = str(message.payload.decode("utf-8"))
-
+def mqtt_sub_callback(message):
+    payload = str(message.message.decode("utf-8"))
+    global mqtt_return
+    mqtt_return=0
     print("[MQTT SUB CB] Message: ", payload)
     print("[MQTT SUB CB] Topic: ", message.topic)
 
@@ -45,9 +46,9 @@ def mqtt_sub_callback(self, client, userdata, message):
     # msg_mqtt_sub.topic = message.topic
     # msg_mqtt_sub.message = payload
     if((str(payload) == "start") or (str(payload) == "Start")):
-        return 1
+        mqtt_return=1
     else:
-        return 0
+        mqtt_return=0
 
 class RosIotBridgeActionClient:
 
@@ -95,6 +96,7 @@ class RosIotBridgeActionClient:
         # if (Comm State == ACTIVE)
         if goal_handle.get_comm_state() == 2:
             rospy.loginfo(str(index) + ": Goal just went active.")
+
         
         # if (Comm State == DONE)
         if goal_handle.get_comm_state() == 7:
@@ -120,10 +122,8 @@ class RosIotBridgeActionClient:
         # msg_mqtt_sub.timestamp = rospy.Time.now()
         # msg_mqtt_sub.topic = message.topic
         # msg_mqtt_sub.message = payload
-        if((str(payload) == "start") or (str(payload) == "Start")):
-            return 1
-        else:
-            return 0
+        if((str(payload) != "start") or (str(payload) != "Start")):
+            sleep(1)
 
     # This function is used to send Goals to Action Server
     def send_goal(self, arg_protocol, arg_mode, arg_topic, arg_message):
@@ -213,7 +213,6 @@ def main():
     # pub = rospy.Publisher("eyrc/rSnNRsNn/ros_to_iot","success:", queue_size=10)
 
     #action client part
-    # rospy.init_node('node_iot_ros_bridge_action_client')
     action_client = RosIotBridgeActionClient()
 
     # goal_handle1 = action_client.send_goal("mqtt", "pub", action_client._config_mqtt_pub_topic, "Hello from Action Client!")
@@ -240,14 +239,15 @@ def main():
     # client.on_connect = on_connect  # Define callback function for successful connection
     # client.on_message = on_message  # Define callback function for receipt of a message
     #client.publish(topic="eyrc/rSnNRsNn/ros_to_iot", payload="Success", qos=0, retain=False)
-    # mqtt_sub = rospy.Subscriber("/ros_iot_bridge/mqtt/sub", msgMqttSub, mqtt_sub_callback)
-
-    goal_handle2 = action_client.send_goal("mqtt", "sub", "eyrc/rSnNRsNn/iot_to_ros", "NA")
-    action_client._goal_handles['2'] = goal_handle2
-    rospy.loginfo("Goal #2 Sent")
+    mqtt_sub = rospy.Subscriber("/ros_iot_bridge/mqtt/sub", msgMqttSub, mqtt_sub_callback)
+    global mqtt_return
+    mqtt_return = 0
+    # goal_handle2 = action_client.send_goal("mqtt", "sub", "eyrc/rSnNRsNn/iot_to_ros", msgMqttSub().message)
+    # action_client._goal_handles['2'] = goal_handle2
+    # rospy.loginfo("Goal #2 Sent")
     while not rospy.is_shutdown():
 
-        if(goal_handle2.get_message=='start'):
+        if(mqtt_return==1):
             obj_client.send_goal(2, 0)
             rospy.sleep(10)
             
