@@ -1,0 +1,42 @@
+<launch>
+
+<!-- pyiot.yaml-->
+<rosparam file ="$(find pkg_ros_iot_bridge)/config/config_pyiot.yaml"/>
+
+<!--node_action_server_ros_iot_bridge-->
+<node pkg="pkg_ros_iot_bridge" type="node_action_server_ros_iot_bridge.py" name="node_action_server_ros_iot_bridge.py" 
+output="screen"/>
+
+<!--turtlesim_node_default colors-->
+<node pkg="turtlesim" type="turtlesim_node" name="node_turtlesim_node" 
+output="screen"/>
+
+<!--Uncomment below lines to for a blue background-->
+<!--
+<node pkg="turtlesim" type="turtlesim_node" name="node_turtlesim_node">
+      <param name="/turtlesim_node/background_r" value="34" />
+      <param name="/turtlesim_node/background_g" value="139" />
+      <param name="/turtlesim_node/background_b" value="34" />
+      <param name="/background_r" value="34" />
+      <param name="/background_g" value="139" />
+      <param name="/background_b" value="34" />
+</node>
+-->
+
+
+<!--node_simple_action_server_turtle-->
+<node pkg="pkg_task1" type="node_simple_action_server_turtle.py" name="node_simple_action_server_turtle.py" 
+output="screen"/>
+
+<!--add shell script to launch file-->
+<node pkg="pkg_task1" type="shell_webpages_launch.sh" name="shell_webpages_launch" output="screen">
+        <param name="cmd" value="$(find pkg_task1)/launch/shell_webpages_launch.sh"/>
+</node>
+
+<!--node_iot_action_client_turtle.py-->
+<node pkg="pkg_task1" type="node_iot_action_client_turtle.py" name="node_iot_action_client_turtle.py" 
+output="screen"/>
+
+
+
+</launch>
