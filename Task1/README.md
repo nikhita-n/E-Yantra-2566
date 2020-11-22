@@ -3,9 +3,9 @@
 <br>
 Copy the packages pkg_ros_iot_bridge and pkg_task1 in your catkin_ws/src
 <br>
-and run these commands:
+and run these commands in catkin_ws:
 <br>
-`$catkin build` and `$source devel/setup.bash`
+` $catkin build ` and `$source devel/setup.bash`
 <br>
 if the files aren't executable, run this in both the packages:
 <br>
