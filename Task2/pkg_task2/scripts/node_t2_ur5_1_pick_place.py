@@ -48,7 +48,7 @@ def gripper_on():
         resp = turn_on(True)
         return resp
     except rospy.ServiceException, e:
-        print "Service call failed: %s" % e
+        print ("Service call failed: %s" %(e,))
 
 def gripper_off():
     rospy.wait_for_service('/eyrc/vb/ur5_1/activate_vacuum_gripper')
@@ -57,7 +57,7 @@ def gripper_off():
         resp = turn_off(False)
         return resp
     except rospy.ServiceException, e:
-        print "Service call failed: %s" % e
+        print ("Service call failed: %s" %(e,))
 
 def all_close(goal, actual, tolerance):
   """
@@ -86,7 +86,7 @@ class MoveGroupPythonIntefaceTutorial(object):
   """MoveGroupPythonIntefaceTutorial"""
   def __init__(self):
     super(MoveGroupPythonIntefaceTutorial, self).__init__()
-
+    
     ## BEGIN_SUB_TUTORIAL setup
     ##
     ## First initialize `moveit_commander`_ and a `rospy`_ node:
@@ -116,7 +116,7 @@ class MoveGroupPythonIntefaceTutorial(object):
     display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path',
                                                    moveit_msgs.msg.DisplayTrajectory,
                                                    queue_size=20)
-
+    rr= rospy.Rate(5)
     # We can get the name of the reference frame for this robot:
     planning_frame = move_group.get_planning_frame()
     print("============ Planning frame: %s" % planning_frame)
@@ -160,11 +160,11 @@ class MoveGroupPythonIntefaceTutorial(object):
     # We can get the joint values from the group and adjust some of the values:
     joint_goal = move_group.get_current_joint_values()
     joint_goal[0] = 0
-    joint_goal[1] = -pi/4
+    joint_goal[1] = 0
     joint_goal[2] = 0
-    joint_goal[3] = -pi/2
+    joint_goal[3] = 0
     joint_goal[4] = 0
-    joint_goal[5] = pi/3
+    joint_goal[5] = 0
 
     # The go command can be called with joint values, poses, or without any
     # parameters if you have already set the pose or joint target for the group
@@ -230,7 +230,7 @@ class MoveGroupPythonIntefaceTutorial(object):
     current_pose = self.move_group.get_current_pose().pose
     return all_close(pose_goal, current_pose, 0.01)
 
-def go_to_pose_goal3(self):
+  def go_to_pose_goal3(self):
     move_group = self.move_group
 
     pose_goal = geometry_msgs.msg.Pose()
@@ -251,7 +251,6 @@ def go_to_pose_goal3(self):
     current_pose = self.move_group.get_current_pose().pose
     return all_close(pose_goal, current_pose, 0.01)
     
-
 
   # def plan_cartesian_path(self, scale=1):
   #   # Copy class variables to local variables to make the web tutorials more clear.
@@ -342,49 +341,48 @@ def go_to_pose_goal3(self):
   #   ## END_SUB_TUTORIAL
 
 
-  # def wait_for_state_update(self, box_is_known=False, box_is_attached=False, timeout=4):
-  #   # Copy class variables to local variables to make the web tutorials more clear.
-  #   # In practice, you should use the class variables directly unless you have a good
-  #   # reason not to.
-  #   box_name = self.box_name
-  #   scene = self.scene
+    def wait_for_state_update(self, box_is_known=False, box_is_attached=False, timeout=4):
+        # Copy class variables to local variables to make the web tutorials more clear.
+        # In practice, you should use the class variables directly unless you have a good
+        # reason not to.
+        box_name = self.box_name
+        scene = self.scene
 
-  #   ## BEGIN_SUB_TUTORIAL wait_for_scene_update
-  #   ##
-  #   ## Ensuring Collision Updates Are Received
-  #   ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  #   ## If the Python node dies before publishing a collision object update message, the message
-  #   ## could get lost and the box will not appear. To ensure that the updates are
-  #   ## made, we wait until we see the changes reflected in the
-  #   ## ``get_attached_objects()`` and ``get_known_object_names()`` lists.
-  #   ## For the purpose of this tutorial, we call this function after adding,
-  #   ## removing, attaching or detaching an object in the planning scene. We then wait
-  #   ## until the updates have been made or ``timeout`` seconds have passed
-  #   start = rospy.get_time()
-  #   seconds = rospy.get_time()
-  #   while (seconds - start < timeout) and not rospy.is_shutdown():
-  #     # Test if the box is in attached objects
-  #     attached_objects = scene.get_attached_objects([box_name])
-  #     is_attached = len(attached_objects.keys()) > 0
+        ## BEGIN_SUB_TUTORIAL wait_for_scene_update
+        ## Ensuring Collision Updates Are Received
+        ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        ## If the Python node dies before publishing a collision object update message, the message
+        ## could get lost and the box will not appear. To ensure that the updates are
+        ## made, we wait until we see the changes reflected in the
+        ## ``get_attached_objects()`` and ``get_known_object_names()`` lists.
+        ## For the purpose of this tutorial, we call this function after adding,
+        ## removing, attaching or detaching an object in the planning scene. We then wait
+        ## until the updates have been made or ``timeout`` seconds have passed
+        start = rospy.get_time()
+        seconds = rospy.get_time()
+        while (seconds - start < timeout) and not rospy.is_shutdown():
+          # Test if the box is in attached objects
+          attached_objects = scene.get_attached_objects([box_name])
+          is_attached = len(attached_objects.keys()) > 0
 
-  #     # Test if the box is in the scene.
-  #     # Note that attaching the box will remove it from known_objects
-  #     is_known = box_name in scene.get_known_object_names()
+          # Test if the box is in the scene.
+          # Note that attaching the box will remove it from known_objects
+          is_known = box_name in scene.get_known_object_names()
 
-  #     # Test if we are in the expected state
-  #     if (box_is_attached == is_attached) and (box_is_known == is_known):
-  #       return True
+          # Test if we are in the expected state
+          if (box_is_attached == is_attached) and (box_is_known == is_known):
+            return True
 
-  #     # Sleep so that we give other threads time on the processor
-  #     rospy.sleep(0.1)
-  #     seconds = rospy.get_time()
+          # Sleep so that we give other threads time on the processor
+          rospy.sleep(0.1)
+          seconds = rospy.get_time()
 
-  #   # If we exited the while loop without returning then we timed out
-  #   return False
-  #   ## END_SUB_TUTORIAL
+        # If we exited the while loop without returning then we timed out
+        return False
+        ## END_SUB_TUTORIAL
 
 
-    def add_box(self, timeout=4):
+    def add_box(self, timeout=6):
         # Copy class variables to local variables to make the web tutorials more clear.
         # In practice, you should use the class variables directly unless you have a good
         # reason not to.
@@ -396,8 +394,14 @@ def go_to_pose_goal3(self):
         ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
         ## First, we will create a box in the planning scene between the fingers:
         box_pose = geometry_msgs.msg.PoseStamped()
-        box_pose.header.frame_id = "panda_hand"
+        
+        # box_pose.header.frame_id = "panda_hand"
+        box_pose.header.frame_id = "/base_link"
+
         box_pose.pose.orientation.w = 0.0
+        box_pose.pose.orientation.x = 0.0
+        box_pose.pose.orientation.y = 0.0
+        box_pose.pose.orientation.z = 0.0
         box_pose.pose.position.x = 0.036260 
         box_pose.pose.position.y = 0.306889 
         box_pose.pose.position.z = 1.965703
@@ -409,7 +413,7 @@ def go_to_pose_goal3(self):
         self.box_name=box_name
         return self.wait_for_state_update(box_is_known=True, timeout=timeout)
 
-    def attach_box(self, timeout=4):
+    def attach_box(self, timeout=6):
         # Copy class variables to local variables to make the web tutorials more clear.
         # In practice, you should use the class variables directly unless you have a good
         # reason not to.
@@ -454,7 +458,6 @@ def go_to_pose_goal3(self):
         box_name = self.box_name
         scene = self.scene
 
-
         scene.remove_world_object(box_name)
 
         ## **Note:** The object must be detached before we can remove it from the world
@@ -464,57 +467,51 @@ def go_to_pose_goal3(self):
 
 def main():
   try:
+    
+    #begin the tutorial by setting up the moveit_commander
     tutorial = MoveGroupPythonIntefaceTutorial()
+    #xecute a movement using a joint state goal
+    rospy.sleep(2)
+    tutorial.go_to_joint_state()
+    #add a box to the planning scene
+    rospy.sleep(4)
     tutorial.add_box()
+    rospy.sleep(6)
+    #execute a movement using a pose goal
     tutorial.go_to_pose_goal2()
+    rospy.sleep(4)
     gripper_on()
-    tutorial.attach_box()
+    rospy.sleep(2)
+    # tutorial.attach_box()
+    #execute a movement using a pose goal
     tutorial.go_to_pose_goal3()
-    tutorial.detach_box()
+    rospy.sleep(4)
+    # tutorial.detach_box()
     gripper_off()
+    rospy.sleep(2)
 
-
-    # input("============ Press `Enter` to begin the tutorial by setting up the moveit_commander ...")
-    # tutorial = MoveGroupPythonIntefaceTutorial()
-
-    # input("============ Press `Enter` to execute a movement using a joint state goal ...")
-    # tutorial.go_to_joint_state()
-
-    # input("============ Press `Enter` to execute a movement using a pose goal ...")
-    # tutorial.go_to_pose_goal()
-
-    # input("============ Press `Enter` to plan and display a Cartesian path ...")
+    #display a Cartesian path
     # cartesian_plan, fraction = tutorial.plan_cartesian_path()
 
-    # input("============ Press `Enter` to display a saved trajectory (this will replay the Cartesian path)  ...")
+    #display a saved trajectory (this will replay the Cartesian path)
     # tutorial.display_trajectory(cartesian_plan)
 
-    # input("============ Press `Enter` to execute a saved path ...")
+    #execute a saved path
     # tutorial.execute_plan(cartesian_plan)
 
-    # input("============ Press `Enter` to add a box to the planning scene ...")
-    # tutorial.add_box()
-
-    # input("============ Press `Enter` to attach a Box to the Panda robot ...")
+    #attach a Box to the Panda robot
     # tutorial.attach_box()
 
-    # input("============ Press `Enter` to plan and execute a path with an attached collision object ...")
+    #plan and execute a path with an attached collision object 
     # cartesian_plan, fraction = tutorial.plan_cartesian_path(scale=-1)
     # tutorial.execute_plan(cartesian_plan)
 
-    # input("============ Press `Enter` to detach the box from the Panda robot ...")
+    #detach the box from the Panda robot
     # tutorial.detach_box()
 
-    # input("============ Press `Enter` to remove the box from the planning scene ...")
+    #remove the box from the planning scene 
     # tutorial.remove_box()
 
-    # gripper_trigger = msg.flag2
-    # if gripper_trigger:
-    #     gripper_on()
-
-
-
-    print("============ Python tutorial demo complete!")
   except rospy.ROSInterruptException:
     return
   except KeyboardInterrupt:
