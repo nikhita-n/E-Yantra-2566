@@ -1,6 +1,8 @@
 <launch>
     
     <!-- Spawn Task-2 Models in Gazebo -->
+    <!-- <include file="$(find pkg_vb_sim)/launch/task2_ur5_world.launch" /> -->
+
     <include file="$(find pkg_vb_sim)/launch/task2_world.launch" />
 
     <include file = "$(find pkg_vb_sim)/launch/gazebo_spawn_ur5_1.launch" >
@@ -24,7 +26,7 @@
     </include>
  
     <!-- Add Shelf to Moveit! Planning Scene in RViz -->
-    <arg name="scene_file" default="$(find pkg_task2)/config/rviz/ur5_1_shelf.scene"/> 
+    <arg name="scene_file" default="$(find pkg_task2)/config/rviz/ur5_1_with_shelf.scene"/> 
     <node name = "moveit_publish_scene_from_text" pkg= "moveit_ros_planning" type = "moveit_publish_scene_from_text" args= "$(arg scene_file)"/>
 
     <!-- Run Task-2 Pick Place ROS Node -->
