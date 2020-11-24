@@ -115,8 +115,8 @@ class MoveGroupPythonIntefaceTutorial(object):
     ## trajectories in Rviz:
     display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path',
                                                    moveit_msgs.msg.DisplayTrajectory,
-                                                   queue_size=20)
-    rr= rospy.Rate(5)
+                                                   queue_size=30)
+    rr= rospy.Rate(3)
     # We can get the name of the reference frame for this robot:
     planning_frame = move_group.get_planning_frame()
     print("============ Planning frame: %s" % planning_frame)
@@ -127,9 +127,10 @@ class MoveGroupPythonIntefaceTutorial(object):
     # for more details on vacuum gripper
     # vacuum_gripper_model_name: "ur5_1"
     # vacuum_gripper_link_name: "vacuum_gripper_link"
-    eef_link = "vacuum_gripper_link"
-    print("============ End effector link: %s" % eef_link)
+    # eef_link = "vacuum_gripper_link"
 
+    print("============ End effector link: %s" % eef_link)
+    eef_link = "vacuum_gripper_link"
     # We can get a list of all the groups in the robot:
     group_names = robot.get_group_names()
     print("============ Available Planning Groups:", robot.get_group_names())
@@ -138,6 +139,8 @@ class MoveGroupPythonIntefaceTutorial(object):
     # robot:
     print("============ Printing robot state")
     print(robot.get_current_state())
+    touch_links = robot.get_link_names(group="ur5_1_planning_group")
+    print("============ Touch links:",touch_links)
     print("")
 
     # Misc variables
@@ -192,10 +195,14 @@ class MoveGroupPythonIntefaceTutorial(object):
     ## We can plan a motion for this group to a desired pose for the
     ## end-effector:
     pose_goal = geometry_msgs.msg.Pose()
-    pose_goal.orientation.w = 1.0
-    pose_goal.position.x = 0.4
-    pose_goal.position.y = 0.1
-    pose_goal.position.z = 0.4
+
+    pose_goal.orientation.x =  0.027
+    pose_goal.orientation.y =  0.001
+    pose_goal.orientation.z = -0.027
+    pose_goal.orientation.w = 0.999
+    pose_goal.position.x = 0.817312194815
+    pose_goal.position.y = 0.108
+    pose_goal.position.z = 0.944
 
     move_group.set_pose_target(pose_goal)
 
@@ -217,13 +224,15 @@ class MoveGroupPythonIntefaceTutorial(object):
     move_group = self.move_group
     pose_goal = geometry_msgs.msg.Pose()
     pose_goal = geometry_msgs.msg.Pose()
-    pose_goal.position.x = -0.817261772949
-    pose_goal.position.y = -0.109110076352
-    pose_goal.position.z = 0.94446979642
-    pose_goal.orientation.x = -0.999999995957
-    pose_goal.orientation.y = 4.37354574363e-05
-    pose_goal.orientation.z = 7.85715579538e-05
-    pose_goal.orientation.w = 2.12177767514e-09
+
+    pose_goal.orientation.x = 0.027
+    pose_goal.orientation.y = 0.000
+    pose_goal.orientation.z = -0.027
+    pose_goal.orientation.w = 0.999
+
+    pose_goal.position.x= 0.00075802653219
+    pose_goal.position.y= 0.24582226028
+    pose_goal.position.z= 1.91234099423
 
     move_group.set_pose_target(pose_goal)
     plan = move_group.go(wait=True)
@@ -238,13 +247,20 @@ class MoveGroupPythonIntefaceTutorial(object):
     move_group = self.move_group
 
     pose_goal = geometry_msgs.msg.Pose()
-    pose_goal.position.x = -0.414925357653
-    pose_goal.position.y = 0.284932768677
-    pose_goal.position.z = 1.78027849967
-    pose_goal.orientation.x = -0.199396929724
-    pose_goal.orientation.y = 1.64394297608e-05
-    pose_goal.orientation.z = 0.979918803013
-    pose_goal.orientation.w = 6.03911583936e-05
+    # pose_goal.position.x = -0.414925357653
+    # pose_goal.position.y = 0.284932768677
+    # pose_goal.position.z = 1.08927849967
+    pose_goal.position.x = -0.799584331372
+    pose_goal.position.y = -0.101489614447
+    pose_goal.position.z = 1.33497401972
+
+    # roll: -0.0845543747753
+    # pitch: -0.00808617063412
+    # yaw: 3.14125785657
+    pose_goal.orientation.x = -0.001
+    pose_goal.orientation.y = -0.000
+    pose_goal.orientation.z = 1
+    pose_goal.orientation.w = 0.027
 
     move_group.set_pose_target(pose_goal)
     plan = move_group.go(wait=True)
@@ -254,95 +270,6 @@ class MoveGroupPythonIntefaceTutorial(object):
 
     current_pose = self.move_group.get_current_pose().pose
     return all_close(pose_goal, current_pose, 0.01)
-    
-
-  # def plan_cartesian_path(self, scale=1):
-  #   # Copy class variables to local variables to make the web tutorials more clear.
-  #   # In practice, you should use the class variables directly unless you have a good
-  #   # reason not to.
-  #   move_group = self.move_group
-
-  #   ## BEGIN_SUB_TUTORIAL plan_cartesian_path
-  #   ##
-  #   ## Cartesian Paths
-  #   ## ^^^^^^^^^^^^^^^
-  #   ## You can plan a Cartesian path directly by specifying a list of waypoints
-  #   ## for the end-effector to go through. If executing  interactively in a
-  #   ## Python shell, set scale = 1.0.
-  #   ##
-  #   waypoints = []
-
-  #   wpose = move_group.get_current_pose().pose
-  #   wpose.position.z -= scale * 0.1  # First move up (z)
-  #   wpose.position.y += scale * 0.2  # and sideways (y)
-  #   waypoints.append(copy.deepcopy(wpose))
-
-  #   wpose.position.x += scale * 0.1  # Second move forward/backwards in (x)
-  #   waypoints.append(copy.deepcopy(wpose))
-
-  #   wpose.position.y -= scale * 0.1  # Third move sideways (y)
-  #   waypoints.append(copy.deepcopy(wpose))
-
-  #   # We want the Cartesian path to be interpolated at a resolution of 1 cm
-  #   # which is why we will specify 0.01 as the eef_step in Cartesian
-  #   # translation.  We will disable the jump threshold by setting it to 0.0,
-  #   # ignoring the check for infeasible jumps in joint space, which is sufficient
-  #   # for this tutorial.
-  #   (plan, fraction) = move_group.compute_cartesian_path(
-  #                                      waypoints,   # waypoints to follow
-  #                                      0.01,        # eef_step
-  #                                      0.0)         # jump_threshold
-
-  #   # Note: We are just planning, not asking move_group to actually move the robot yet:
-  #   return plan, fraction
-
-  #   ## END_SUB_TUTORIAL
-
-
-  # def display_trajectory(self, plan):
-  #   # Copy class variables to local variables to make the web tutorials more clear.
-  #   # In practice, you should use the class variables directly unless you have a good
-  #   # reason not to.
-  #   robot = self.robot
-  #   display_trajectory_publisher = self.display_trajectory_publisher
-
-  #   ## BEGIN_SUB_TUTORIAL display_trajectory
-  #   ##
-  #   ## Displaying a Trajectory
-  #   ## ^^^^^^^^^^^^^^^^^^^^^^^
-  #   ## You can ask RViz to visualize a plan (aka trajectory) for you. But the
-  #   ## group.plan() method does this automatically so this is not that useful
-  #   ## here (it just displays the same trajectory again):
-  #   ##
-  #   ## A `DisplayTrajectory`_ msg has two primary fields, trajectory_start and trajectory.
-  #   ## We populate the trajectory_start with our current robot state to copy over
-  #   ## any AttachedCollisionObjects and add our plan to the trajectory.
-  #   display_trajectory = moveit_msgs.msg.DisplayTrajectory()
-  #   display_trajectory.trajectory_start = robot.get_current_state()
-  #   display_trajectory.trajectory.append(plan)
-  #   # Publish
-  #   display_trajectory_publisher.publish(display_trajectory);
-
-  #   ## END_SUB_TUTORIAL
-
-
-  # def execute_plan(self, plan):
-  #   # Copy class variables to local variables to make the web tutorials more clear.
-  #   # In practice, you should use the class variables directly unless you have a good
-  #   # reason not to.
-  #   move_group = self.move_group
-
-  #   ## BEGIN_SUB_TUTORIAL execute_plan
-  #   ##
-  #   ## Executing a Plan
-  #   ## ^^^^^^^^^^^^^^^^
-  #   ## Use execute if you would like the robot to follow
-  #   ## the plan that has already been computed:
-  #   move_group.execute(plan, wait=True)
-
-  #   ## **Note:** The robot's current joint state must be within some tolerance of the
-  #   ## first waypoint in the `RobotTrajectory`_ or ``execute()`` will fail
-  #   ## END_SUB_TUTORIAL
 
 
   def wait_for_state_update(self, box_is_known=False, box_is_attached=False, timeout=4):
@@ -405,13 +332,20 @@ class MoveGroupPythonIntefaceTutorial(object):
     # box_pose.header.frame_id = "/base_link"
     box_pose.header.frame_id = "world"
 
-    box_pose.pose.orientation.w = 0.0
+    # box_pose.pose.orientation.w = 0.0
+    box_pose.pose.orientation.w = 1.0
     box_pose.pose.orientation.x = 0.0
     box_pose.pose.orientation.y = 0.0
     box_pose.pose.orientation.z = 0.0
-    box_pose.pose.position.x = 0.036260 
-    box_pose.pose.position.y = 0.306889 
-    box_pose.pose.position.z = 1.965703
+    # box_pose.pose.position.x = 0.036260 
+    # box_pose.pose.position.y = 0.306889 
+    # box_pose.pose.position.z = 1.965703
+    # box_pose.pose.position.x = 0.036260+0.04 
+    # box_pose.pose.position.y = 0.306889+0.76
+    # box_pose.pose.position.z = 1.965703-0.05
+    box_pose.pose.position.x = 0.01 
+    box_pose.pose.position.y = 0.45311
+    box_pose.pose.position.z = 1.91
     # box_name = "box"
     box_name = 'package$1'
     scene.add_box(box_name, box_pose, size=(0.15, 0.15, 0.15))
@@ -442,6 +376,7 @@ class MoveGroupPythonIntefaceTutorial(object):
     # grasping_group = 'hand'
     grasping_group = "ur5_1_planning_group"
     touch_links = robot.get_link_names(group=grasping_group)
+    print(touch_links)
     scene.attach_box(eef_link, box_name, touch_links=touch_links)
 
     # We wait for the planning scene to update.
@@ -481,53 +416,50 @@ def main():
     tutorial = MoveGroupPythonIntefaceTutorial()
     #xecute a movement using a joint state goal
     rospy.sleep(2)
-    tutorial.go_to_joint_state()
-    #add a box to the planning scene
-    rospy.sleep(4)
-    tutorial.add_box()
-    rospy.sleep(6)
-    tutorial.attach_box()
-    rospy.sleep(6)
-    #execute a movement using a pose goal
-    tutorial.go_to_pose_goal2()
-    rospy.sleep(4)
-    gripper_on()
-    rospy.sleep(2)
 
+
+    # tutorial.go_to_pose_goal1()
+    # rospy.sleep(8)
+    # tutorial.go_to_joint_state()
+    #add a box to the planning scene
+    # rospy.sleep(4)
+
+
+    # tutorial.add_box()
+    # rospy.sleep(11)
+    # # tutorial.attach_box()
+    # # rospy.sleep(6)
+    # #execute a movement using a pose goal
+    # tutorial.go_to_pose_goal2()
+    # rospy.sleep(11)
+    # gripper_on()
+    # rospy.sleep(3)
     # tutorial.attach_box()
-    #execute a movement using a pose goal
+    # # rospy.sleep(6)
+    # rospy.sleep(15)
+    # #execute a movement using a pose goal
+    # tutorial.go_to_pose_goal3()
+    # rospy.sleep(13)
+    # gripper_off()
+    # rospy.sleep(3)
+    # tutorial.detach_box()
+    # rospy.sleep(3)
+    # tutorial.remove_box()
+    # rospy.sleep(2)
+
+    tutorial.go_to_pose_goal2()
+    rospy.sleep(1)
+    tutorial.add_box()
+    tutorial.attach_box()
+    gripper_on()
+
     tutorial.go_to_pose_goal3()
-    rospy.sleep(4)
+    rospy.sleep(1)
     tutorial.detach_box()
     tutorial.remove_box()
-    rospy.sleep(6)
-
-    # tutorial.detach_box()
     gripper_off()
-    rospy.sleep(2)
 
-    #display a Cartesian path
-    # cartesian_plan, fraction = tutorial.plan_cartesian_path()
-
-    #display a saved trajectory (this will replay the Cartesian path)
-    # tutorial.display_trajectory(cartesian_plan)
-
-    #execute a saved path
-    # tutorial.execute_plan(cartesian_plan)
-
-    #attach a Box to the Panda robot
-    # tutorial.attach_box()
-
-    #plan and execute a path with an attached collision object 
-    # cartesian_plan, fraction = tutorial.plan_cartesian_path(scale=-1)
-    # tutorial.execute_plan(cartesian_plan)
-
-    #detach the box from the Panda robot
-    # tutorial.detach_box()
-
-    #remove the box from the planning scene 
-    # tutorial.remove_box()
-
+    
   except rospy.ROSInterruptException:
     return
   except KeyboardInterrupt:
