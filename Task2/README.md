@@ -13,8 +13,9 @@ if the files aren't executable, run this in the package script folders:
 <br>
 <br>
 In short, You need the three packages:<br>
-`pkg_moveit_ur5_1` , `pkg_task2` and `vb_simulation_pkgs`
+`pkg_moveit_ur5_1 ` , `pkg_task2` and `vb_simulation_pkgs`
 <br>
+
 <br>
 To see the output, run this:<br>
 `$roslaunch pkg_task2 task2.launch`
@@ -26,4 +27,4 @@ To run the main python node, run this:<br>
 
 <br>
 Our Task 2 output video URL(unlisted):<br>
-`https://youtu.be/gwIhEvKGKQA`<br>
+https://youtu.be/gwIhEvKGKQA<br>
