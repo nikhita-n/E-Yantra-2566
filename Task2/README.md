@@ -38,5 +38,4 @@ To run the main python node, run this:<br>
 <br>
 <br>
 Our Task 2 output video URL(unlisted):<br>
-
 https://youtu.be/gwIhEvKGKQA<br>
