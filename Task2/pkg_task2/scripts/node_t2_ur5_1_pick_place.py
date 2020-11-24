@@ -1,16 +1,7 @@
 #!/usr/bin/env python
 
-## BEGIN_SUB_TUTORIAL imports
-##
-## To use the Python MoveIt interfaces, we will import the `moveit_commander`_ namespace.
-## This namespace provides us with a `MoveGroupCommander`_ class, a `PlanningSceneInterface`_ class,
-## and a `RobotCommander`_ class. More on these below. We also import `rospy`_ and some messages that we will use:
-##
-
-# Python 2/3 compatibility imports
 from __future__ import print_function
 from six.moves import input
-
 import sys
 import copy
 import rospy
@@ -23,14 +14,10 @@ from std_msgs.msg import String
 from moveit_commander.conversions import pose_to_list
 from std_msgs.msg import Header
 from std_msgs.msg import Bool
-# from std_srvs.srv import Empty
-
 from gazebo_ros_link_attacher.srv import Attach, AttachRequest, AttachResponse
-
 from pkg_vb_sim.srv import vacuumGripper
 from pkg_vb_sim.srv import vacuumGripperRequest
 from pkg_vb_sim.srv import vacuumGripperResponse
-
 from pkg_vb_sim.msg import LogicalCameraImage
 
 def gripper_status(msg):
@@ -38,6 +25,7 @@ def gripper_status(msg):
         return True
         # print('gripper status = {}'.format(msg.data))
 
+#Function to turn on the vacuum gripper
 def gripper_on():
     # Wait till the srv is available
     rospy.wait_for_service('/eyrc/vb/ur5_1/activate_vacuum_gripper')
@@ -50,6 +38,7 @@ def gripper_on():
     except rospy.ServiceException, e:
         print ("Service call failed: %s" %(e,))
 
+#Function to turn off the vacuum gripper
 def gripper_off():
     rospy.wait_for_service('/eyrc/vb/ur5_1/activate_vacuum_gripper')
     try:
@@ -82,13 +71,11 @@ def all_close(goal, actual, tolerance):
   return True
 
 
-class MoveGroupPythonIntefaceTutorial(object):
-  """MoveGroupPythonIntefaceTutorial"""
+class task2_robot(object):
+  """task2_robot"""
   def __init__(self):
-    super(MoveGroupPythonIntefaceTutorial, self).__init__()
-    
-    ## BEGIN_SUB_TUTORIAL setup
-    ##
+    super(task2_robot, self).__init__()
+
     ## First initialize `moveit_commander`_ and a `rospy`_ node:
     moveit_commander.roscpp_initialize(sys.argv)
     rospy.init_node('node_t2_ur5_1_pick_place', anonymous=True)
@@ -103,11 +90,7 @@ class MoveGroupPythonIntefaceTutorial(object):
     scene = moveit_commander.PlanningSceneInterface()
 
     ## Instantiate a `MoveGroupCommander`_ object.  This object is an interface
-    ## to a planning group (group of joints).  In this tutorial the group is the primary
-    ## arm joints in the Panda robot, so we set the group's name to "panda_arm".
-    ## If you are using a different robot, change this value to the name of your robot
-    ## arm planning group.
-    ## This interface can be used to plan and execute motions:
+    ## to a planning group (group of joints)
     group_name = "ur5_1_planning_group"
     move_group = moveit_commander.MoveGroupCommander(group_name)
 
@@ -115,7 +98,7 @@ class MoveGroupPythonIntefaceTutorial(object):
     ## trajectories in Rviz:
     display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path',
                                                    moveit_msgs.msg.DisplayTrajectory,
-                                                   queue_size=30)
+                                                   queue_size=40)
     rr= rospy.Rate(3)
     # We can get the name of the reference frame for this robot:
     planning_frame = move_group.get_planning_frame()
@@ -123,8 +106,7 @@ class MoveGroupPythonIntefaceTutorial(object):
 
     # We can also print the name of the end-effector link for this group:
     eef_link = move_group.get_end_effector_link()
-    # See the /home/somayaji/catkin_ws/src/vb_simulation_pkgs/pkg_vb_sim/config/config_vacuum_gripper.yaml
-    # for more details on vacuum gripper
+    # for more details on vacuum gripper:
     # vacuum_gripper_model_name: "ur5_1"
     # vacuum_gripper_link_name: "vacuum_gripper_link"
     # eef_link = "vacuum_gripper_link"
@@ -155,15 +137,9 @@ class MoveGroupPythonIntefaceTutorial(object):
 
 
   def go_to_joint_state(self):
-    # Copy class variables to local variables to make the web tutorials more clear.
-    # In practice, you should use the class variables directly unless you have a good
-    # reason not to.
     move_group = self.move_group
 
     ## Planning to a Joint Goal
-    ## ^^^^^^^^^^^^^^^^^^^^^^^^
-    ## The Panda's zero configuration is at a `singularity <https://www.quora.com/Robotics-What-is-meant-by-kinematic-singularity>`_ so the first
-    ## thing we want to do is move it to a slightly better configuration.
     # We can get the joint values from the group and adjust some of the values:
     joint_goal = move_group.get_current_joint_values()
     joint_goal[0] = 0
@@ -172,7 +148,6 @@ class MoveGroupPythonIntefaceTutorial(object):
     joint_goal[3] = 0
     joint_goal[4] = 0
     joint_goal[5] = 0
-
     # The go command can be called with joint values, poses, or without any
     # parameters if you have already set the pose or joint target for the group
     move_group.go(joint_goal, wait=True)
@@ -183,15 +158,11 @@ class MoveGroupPythonIntefaceTutorial(object):
     current_joints = move_group.get_current_joint_values()
     return all_close(joint_goal, current_joints, 0.01)
 
-
+  #Pose similar to AllZeros pose in the eyrc tutorials
   def go_to_pose_goal1(self):
-    # Copy class variables to local variables to make the web tutorials more clear.
-    # In practice, you should use the class variables directly unless you have a good
-    # reason not to.
     move_group = self.move_group
 
     ## Planning to a Pose Goal
-    ## ^^^^^^^^^^^^^^^^^^^^^^^
     ## We can plan a motion for this group to a desired pose for the
     ## end-effector:
     pose_goal = geometry_msgs.msg.Pose()
@@ -215,11 +186,11 @@ class MoveGroupPythonIntefaceTutorial(object):
     move_group.clear_pose_targets()
 
     # For testing:
-    # Note that since this section of code will not be included in the tutorials
     # we use the class variable rather than the copied state variable
     current_pose = self.move_group.get_current_pose().pose
     return all_close(pose_goal, current_pose, 0.01)
 
+  #Pose to go near the blue box (to pick it)
   def go_to_pose_goal2(self):
     move_group = self.move_group
     pose_goal = geometry_msgs.msg.Pose()
@@ -243,51 +214,39 @@ class MoveGroupPythonIntefaceTutorial(object):
     current_pose = self.move_group.get_current_pose().pose
     return all_close(pose_goal, current_pose, 0.01)
 
+  #Pose to go near the bin
   def go_to_pose_goal3(self):
     move_group = self.move_group
 
     pose_goal = geometry_msgs.msg.Pose()
-    # pose_goal.position.x = -0.414925357653
-    # pose_goal.position.y = 0.284932768677
-    # pose_goal.position.z = 1.08927849967
-    pose_goal.position.x = -0.799584331372
-    pose_goal.position.y = -0.101489614447
-    pose_goal.position.z = 1.33497401972
 
-    # roll: -0.0845543747753
-    # pitch: -0.00808617063412
-    # yaw: 3.14125785657
-    pose_goal.orientation.x = -0.001
-    pose_goal.orientation.y = -0.000
-    pose_goal.orientation.z = 1
-    pose_goal.orientation.w = 0.027
+    pose_goal.position.x = -0.82338
+    pose_goal.position.y = 0.02557
+    pose_goal.position.z = 1.1232
+    pose_goal.orientation.x = 0.000266
+    pose_goal.orientation.y = -0.999999
+    pose_goal.orientation.z = 8.2031e-06
+    pose_goal.orientation.w = 9.48109e-05
 
     move_group.set_pose_target(pose_goal)
     plan = move_group.go(wait=True)
     move_group.stop()
 
     move_group.clear_pose_targets()
-
     current_pose = self.move_group.get_current_pose().pose
     return all_close(pose_goal, current_pose, 0.01)
 
 
   def wait_for_state_update(self, box_is_known=False, box_is_attached=False, timeout=4):
-    # Copy class variables to local variables to make the web tutorials more clear.
-    # In practice, you should use the class variables directly unless you have a good
-    # reason not to.
-
     box_name = self.box_name
     scene = self.scene
 
-    ## BEGIN_SUB_TUTORIAL wait_for_scene_update
     ## Ensuring Collision Updates Are Received
-    ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     ## If the Python node dies before publishing a collision object update message, the message
     ## could get lost and the box will not appear. To ensure that the updates are
     ## made, we wait until we see the changes reflected in the
     ## ``get_attached_objects()`` and ``get_known_object_names()`` lists.
-    ## For the purpose of this tutorial, we call this function after adding,
+    ##We call this function after adding,
     ## removing, attaching or detaching an object in the planning scene. We then wait
     ## until the updates have been made or ``timeout`` seconds have passed
     start = rospy.get_time()
@@ -296,11 +255,9 @@ class MoveGroupPythonIntefaceTutorial(object):
       # Test if the box is in attached objects
       attached_objects = scene.get_attached_objects([box_name])
       is_attached = len(attached_objects.keys()) > 0
-
       # Test if the box is in the scene.
       # Note that attaching the box will remove it from known_objects
       is_known = box_name in scene.get_known_object_names()
-
       # Test if we are in the expected state
       if (box_is_attached == is_attached) and (box_is_known == is_known):
         return True
@@ -308,57 +265,33 @@ class MoveGroupPythonIntefaceTutorial(object):
       # Sleep so that we give other threads time on the processor
       rospy.sleep(0.1)
       seconds = rospy.get_time()
-
     # If we exited the while loop without returning then we timed out
     return False
-    ## END_SUB_TUTORIAL
 
 
   def add_box(self, timeout=6):
-    # Copy class variables to local variables to make the web tutorials more clear.
-    # In practice, you should use the class variables directly unless you have a good
-    # reason not to.
     self.box_name = 'package$1'
     box_name = self.box_name
     scene = self.scene
 
-
     ## Adding Objects to the Planning Scene
-    ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ## First, we will create a box in the planning scene between the fingers:
     box_pose = geometry_msgs.msg.PoseStamped()
-    
-    # box_pose.header.frame_id = "panda_hand"
-    # box_pose.header.frame_id = "/base_link"
     box_pose.header.frame_id = "world"
 
-    # box_pose.pose.orientation.w = 0.0
     box_pose.pose.orientation.w = 1.0
     box_pose.pose.orientation.x = 0.0
     box_pose.pose.orientation.y = 0.0
     box_pose.pose.orientation.z = 0.0
-    # box_pose.pose.position.x = 0.036260 
-    # box_pose.pose.position.y = 0.306889 
-    # box_pose.pose.position.z = 1.965703
-    # box_pose.pose.position.x = 0.036260+0.04 
-    # box_pose.pose.position.y = 0.306889+0.76
-    # box_pose.pose.position.z = 1.965703-0.05
     box_pose.pose.position.x = 0.01 
     box_pose.pose.position.y = 0.45311
     box_pose.pose.position.z = 1.91
-    # box_name = "box"
+
     box_name = 'package$1'
     scene.add_box(box_name, box_pose, size=(0.15, 0.15, 0.15))
-
-    # Copy local variables back to class variables. In practice, you should use the class
-    # variables directly unless you have a good reason not to.
     self.box_name=box_name
     return self.wait_for_state_update(box_is_known=True, timeout=timeout)
 
   def attach_box(self, timeout=6):
-    # Copy class variables to local variables to make the web tutorials more clear.
-    # In practice, you should use the class variables directly unless you have a good
-    # reason not to.
     box_name = self.box_name
     robot = self.robot
     scene = self.scene
@@ -366,35 +299,26 @@ class MoveGroupPythonIntefaceTutorial(object):
     group_names = self.group_names
 
     ## Attaching Objects to the Robot
-
-    ## Next, we will attach the box to the Panda wrist. Manipulating objects requires the
+    ## Manipulating objects requires the
     ## robot be able to touch them without the planning scene reporting the contact as a
     ## collision. By adding link names to the ``touch_links`` array, we are telling the
-    ## planning scene to ignore collisions between those links and the box. For the Panda
-    ## robot, we set ``grasping_group = 'hand'``. If you are using a different robot,
-    ## you should change this value to the name of your end effector group name.
-    # grasping_group = 'hand'
+    ## planning scene to ignore collisions between those links and the box.
     grasping_group = "ur5_1_planning_group"
     touch_links = robot.get_link_names(group=grasping_group)
-    print(touch_links)
+    # print(touch_links)
     scene.attach_box(eef_link, box_name, touch_links=touch_links)
 
     # We wait for the planning scene to update.
     return self.wait_for_state_update(box_is_attached=True, box_is_known=False, timeout=timeout)
 
   def detach_box(self, timeout=4):
-    # Copy class variables to local variables to make the web tutorials more clear.
-    # In practice, you should use the class variables directly unless you have a good
-    # reason not to.
     box_name = self.box_name
     scene = self.scene
     eef_link = self.eef_link
 
     ## Detaching Objects from the Robot
-
     ## We can also detach and remove the object from the planning scene:
     scene.remove_attached_object(eef_link, name=box_name)
-
     # We wait for the planning scene to update.
     return self.wait_for_state_update(box_is_known=True, box_is_attached=False, timeout=timeout)
 
@@ -403,63 +327,54 @@ class MoveGroupPythonIntefaceTutorial(object):
     scene = self.scene
 
     scene.remove_world_object(box_name)
-
     ## **Note:** The object must be detached before we can remove it from the world
     # We wait for the planning scene to update.
     return self.wait_for_state_update(box_is_attached=False, box_is_known=False, timeout=timeout)
 
 
 def main():
-  try:
-    
-    #begin the tutorial by setting up the moveit_commander
-    tutorial = MoveGroupPythonIntefaceTutorial()
-    #xecute a movement using a joint state goal
-    rospy.sleep(2)
+  try:    
+    #setting up the moveit_commander
+    ur5_1 = task2_robot()
 
+    #Adding initial delay to record or adjust screen
+    # rospy.sleep(9)
 
-    # tutorial.go_to_pose_goal1()
+    #Uncomment these two lines if needed to go to pose goal 1 initially:
+    # ur5_1.go_to_pose_goal1()
     # rospy.sleep(8)
-    # tutorial.go_to_joint_state()
+
     #add a box to the planning scene
-    # rospy.sleep(4)
+    ur5_1.add_box()
+    rospy.sleep(3)
 
+    #Go near the blue box to pick it
+    ur5_1.go_to_pose_goal2()
+    rospy.sleep(4)
 
-    # tutorial.add_box()
-    # rospy.sleep(11)
-    # # tutorial.attach_box()
-    # # rospy.sleep(6)
-    # #execute a movement using a pose goal
-    # tutorial.go_to_pose_goal2()
-    # rospy.sleep(11)
-    # gripper_on()
-    # rospy.sleep(3)
-    # tutorial.attach_box()
-    # # rospy.sleep(6)
-    # rospy.sleep(15)
-    # #execute a movement using a pose goal
-    # tutorial.go_to_pose_goal3()
-    # rospy.sleep(13)
-    # gripper_off()
-    # rospy.sleep(3)
-    # tutorial.detach_box()
-    # rospy.sleep(3)
-    # tutorial.remove_box()
-    # rospy.sleep(2)
-
-    tutorial.go_to_pose_goal2()
-    rospy.sleep(1)
-    tutorial.add_box()
-    tutorial.attach_box()
+    #attach the box
+    ur5_1.attach_box()
+    rospy.sleep(2)
+    #Turn on the vacuum gripper
     gripper_on()
-
-    tutorial.go_to_pose_goal3()
     rospy.sleep(1)
-    tutorial.detach_box()
-    tutorial.remove_box()
-    gripper_off()
 
-    
+    #Go near the bin to drop the box
+    ur5_1.go_to_pose_goal3()
+    rospy.sleep(4)
+    #detach the box
+    ur5_1.detach_box()
+    rospy.sleep(1)
+    #Remove the box 
+    ur5_1.remove_box()
+    #Turn off the vacuum gripper
+    gripper_off()
+    rospy.sleep(1)
+
+    #Make all the joint angles zero
+    ur5_1.go_to_joint_state()
+    rospy.sleep(4)
+
   except rospy.ROSInterruptException:
     return
   except KeyboardInterrupt:
