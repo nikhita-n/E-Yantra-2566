@@ -12,11 +12,18 @@ if the files aren't executable, run this in the package script folders:
 `$chmod +x *` 
 <br>
 <br>
-Right now, I have uploaded rough framework
+In short, You need the three packages:<br>
+`pkg_moveit_ur5_1` , `pkg_task2` and `vb_simulation_pkgs`
 <br>
-
+<br>
+To see the output, run this:<br>
+`$roslaunch pkg_task2 task2.launch`
+<br>
+<br>
+To run the main python node, run this:<br>
+`$rosrun pkg_task2 node_t2_ur5_1_pick_place.py`
 <br>
 
 <br>
 Our Task 2 output video URL(unlisted):<br>
-`yet to be uploaded`<br>
+`https://youtu.be/gwIhEvKGKQA`<br>
