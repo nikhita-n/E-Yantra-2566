@@ -4,9 +4,10 @@
 Copy the packages pkg_ros_iot_bridge and pkg_task1 in your catkin_ws/src
 <br>
 and run these commands in catkin_ws:
-<br>
-` $catkin build ` and `$source devel/setup.bash`
-<br>
+
+`$catkin build` and `$source devel/setup.bash`
+
+
 if the files aren't executable, run this in both the packages:
 <br>
 `$chmod +x *` 
@@ -26,4 +27,6 @@ The turtle will then start tracing a hexagon!<br>
 You can see the coordinates getting updated on the excel sheet and under messages in Hive MQTT Client<br>
 <br>
 Our Task 1 output video URL(unlisted):<br>
-`https://youtu.be/dkiJjR7uH-U`<br>
+
+https://youtu.be/dkiJjR7uH-U
+<br>
